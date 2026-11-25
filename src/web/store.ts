@@ -376,10 +376,10 @@ export async function act(label: string, action: Action): Promise<boolean> {
   }
 }
 
-export async function openInOrca(repo: string, number: number, headRefName: string): Promise<void> {
+export async function openInOrca(repo: string, number: number): Promise<void> {
   setState({ busy: 'Opening in Orca', notice: null })
   try {
-    const { message } = await request('inbox.open', { repo, number, headRefName }, { timeoutMs: 120_000 })
+    const { message } = await request('inbox.open', { repo, number }, { timeoutMs: 120_000 })
     setState({ notice: { tone: 'success', text: message } })
   } catch (error) {
     setState({ notice: { tone: 'danger', text: errorText(error) } })

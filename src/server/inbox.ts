@@ -213,11 +213,13 @@ export function inbox() {
   }
 
   /** The worktree already on the PR's branch, else a new worktree that checks the head branch out. */
-  async function open(repoSlug: string, number: number, headRefName: string): Promise<{ message: string }> {
+  async function open(repoSlug: string, number: number): Promise<{ message: string }> {
     const repo = (await repos()).get(repoSlug.toLowerCase())
     if (!repo) throw new Error(`${repoSlug} is not a repository in Orca on this machine.`)
 
-    const tree = await worktreeOn(repo, headRefName)
+    // a fork's branch can share a name with a local one, so even finding a worktree waits for GitHub
+    const head = await headOf(repoSlug, number)
+    const tree = await worktreeOn(repo, head)
     if (tree) {
       // Orca reveals a worktree by focusing one of its terminals; a new one is opened when it has none
       const terminal = (await terminals().catch(() => [])).find((row) => row.worktreePath === tree.path && row.handle)
@@ -226,8 +228,8 @@ export function inbox() {
       return { message: `Opened ${tree.displayName}` }
     }
 
-    const head = await headOf(repoSlug, number)
-    await run('git', ['-C', repo.path, 'fetch', 'origin', `refs/heads/${head}:refs/remotes/origin/${head}`], {
+    // forced like origin's own refspec: a rebased pull request moves its branch backwards
+    await run('git', ['-C', repo.path, 'fetch', 'origin', `+refs/heads/${head}:refs/remotes/origin/${head}`], {
       timeoutMs: 60_000
     })
     await orca([
