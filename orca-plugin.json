@@ -10,6 +10,11 @@
   },
   "repository": "https://github.com/ablause/orca-github-pull-requests",
   "license": "MIT",
+  "icon": "assets/icon.png",
+  "cover": {
+    "path": "assets/cover.png",
+    "alt": "Merge blockers struck through down to Ready to merge, beside the panel showing a pull request ready to merge with its Merge button"
+  },
   "engines": {
     "orca": ">=1.4.248"
   },
