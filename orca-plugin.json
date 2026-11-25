@@ -1,0 +1,57 @@
+{
+  "manifestVersion": 2,
+  "id": "github",
+  "name": "GitHub",
+  "version": "0.1.0",
+  "description": "The pull request of the focused worktree's branch, with its images, conversation, checks, files and merge actions, and the repository's pull requests one step back.",
+  "author": {
+    "name": "ablause",
+    "url": "https://github.com/ablause"
+  },
+  "repository": "https://github.com/ablause/orca-plugins",
+  "license": "MIT",
+  "engines": {
+    "orca": ">=1.4.248"
+  },
+  "execution": "trusted-worker",
+  "pluginApi": 1,
+  "main": "src/worker.ts",
+  "contributes": {
+    "panels": [
+      {
+        "id": "pull-request",
+        "title": "GitHub",
+        "icon": "cloud",
+        "entry": "src/web/main.ts",
+        "ui": "html"
+      }
+    ],
+    "hooks": [
+      {
+        "event": "agent.tool.before"
+      },
+      {
+        "event": "agent.tool.after"
+      }
+    ],
+    "events": [
+      {
+        "on": "agent.status.changed"
+      }
+    ]
+  },
+  "capabilities": [
+    {
+      "kind": "workspace:read"
+    },
+    {
+      "kind": "agent:read"
+    },
+    {
+      "kind": "terminal:send"
+    },
+    {
+      "kind": "storage:own"
+    }
+  ]
+}
