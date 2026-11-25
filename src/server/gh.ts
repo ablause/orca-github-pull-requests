@@ -2,6 +2,17 @@ import { CommandError, run, type RunOptions } from './exec.ts'
 
 export class GhError extends Error {}
 
+const SIGNED_OUT = /gh auth login|GH_TOKEN/
+
+/** What someone setting the plugin up needs to read when gh cannot run: the fix, not gh's own output. */
+export function ghFailure(error: unknown): string {
+  if (error instanceof CommandError && error.missing) {
+    return 'the GitHub CLI (gh) is not installed. Install it from https://cli.github.com, then run gh auth login.'
+  }
+  const message = error instanceof Error ? error.message : String(error)
+  return SIGNED_OUT.test(message) ? 'the GitHub CLI is not signed in. Run gh auth login in a terminal.' : message
+}
+
 const RATE_LIMITED = /rate limit|secondary rate|abuse detection/i
 /** No GitHub call goes out before this time: a rate-limited token only digs its hole deeper. */
 let blockedUntil = 0
@@ -10,7 +21,7 @@ async function exec(args: string[], options: RunOptions): Promise<string> {
   try {
     return await run('gh', args, options)
   } catch (error) {
-    throw new GhError(error instanceof CommandError ? error.message : String(error))
+    throw new GhError(ghFailure(error))
   }
 }
 
