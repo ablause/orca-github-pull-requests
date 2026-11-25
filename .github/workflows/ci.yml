@@ -19,4 +19,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # the Orca typings come from the Orca release the plugin is typed against
+      - run: scripts/orca-types.sh .
+        env:
+          ORCA_VERSION: 1.4.272
       - run: npm run check
