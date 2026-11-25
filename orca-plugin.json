@@ -18,7 +18,8 @@
   "screenshots": [
     {
       "path": "assets/screenshot-status.png",
-      "caption": "What blocks the merge, unfolded: checks, conflicts and the merge method"
+      "caption": "What blocks the merge, unfolded: checks, conflicts and the merge method",
+      "alt": "The panel's status line unfolded: one check passed, no conflicts with main, the merge method, Convert to draft and Close"
     }
   ],
   "engines": {
