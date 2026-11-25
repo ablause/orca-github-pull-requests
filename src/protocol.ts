@@ -282,7 +282,7 @@ declare module 'orca' {
     'agent.send': { input: { terminalId: string; text: string }; output: { accepted: boolean } }
     'inbox.get': { input: { force: boolean }; output: Inbox }
     /** Reveals the worktree already on the PR's branch, or creates one that checks it out. */
-    'inbox.open': { input: { repo: string; number: number; headRefName: string }; output: { message: string } }
+    'inbox.open': { input: { repo: string; number: number }; output: { message: string } }
   }
   interface PluginPanelEvents {
     /** An agent asked a question, or one was answered: the panel reads its worktree's again. */

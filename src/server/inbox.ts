@@ -193,12 +193,33 @@ export function inbox() {
     return repo ? ((await worktreeOn(repo, headRefName))?.path ?? null) : null
   }
 
+  /** The branch to check out, as GitHub names it: the panel's word is not enough to run git with. */
+  async function headOf(repoSlug: string, number: number): Promise<string> {
+    const [owner, name] = repoSlug.split('/') as [string, string]
+    const data = await graphql<{
+      repository: { pullRequest: { headRefName: string; isCrossRepository: boolean } | null } | null
+    }>(
+      'query ($o: String!, $r: String!, $n: Int!) { repository(owner: $o, name: $r) { pullRequest(number: $n) { headRefName isCrossRepository } } }',
+      { o: owner, r: name, n: number }
+    )
+    const pr = data.repository?.pullRequest
+    if (!pr) throw new Error(`#${number} is not a pull request of ${repoSlug}.`)
+    // a fork's branch is not on origin: a branch of the same name there would be other code
+    if (pr.isCrossRepository) {
+      throw new Error(`#${number} comes from a fork. Check it out with gh pr checkout ${number} -R ${repoSlug}.`)
+    }
+    if (pr.headRefName.startsWith('-')) throw new Error(`#${number} has a branch name git would read as an option.`)
+    return pr.headRefName
+  }
+
   /** The worktree already on the PR's branch, else a new worktree that checks the head branch out. */
-  async function open(repoSlug: string, number: number, headRefName: string): Promise<{ message: string }> {
+  async function open(repoSlug: string, number: number): Promise<{ message: string }> {
     const repo = (await repos()).get(repoSlug.toLowerCase())
     if (!repo) throw new Error(`${repoSlug} is not a repository in Orca on this machine.`)
 
-    const tree = await worktreeOn(repo, headRefName)
+    // a fork's branch can share a name with a local one, so even finding a worktree waits for GitHub
+    const head = await headOf(repoSlug, number)
+    const tree = await worktreeOn(repo, head)
     if (tree) {
       // Orca reveals a worktree by focusing one of its terminals; a new one is opened when it has none
       const terminal = (await terminals().catch(() => [])).find((row) => row.worktreePath === tree.path && row.handle)
@@ -207,7 +228,10 @@ export function inbox() {
       return { message: `Opened ${tree.displayName}` }
     }
 
-    await run('git', ['-C', repo.path, 'fetch', 'origin', headRefName], { timeoutMs: 60_000 })
+    // forced like origin's own refspec: a rebased pull request moves its branch backwards
+    await run('git', ['-C', repo.path, 'fetch', 'origin', `+refs/heads/${head}:refs/remotes/origin/${head}`], {
+      timeoutMs: 60_000
+    })
     await orca([
       'worktree',
       'create',
@@ -216,9 +240,9 @@ export function inbox() {
       '--name',
       `review-${number}`,
       '--branch',
-      headRefName,
+      head,
       '--base-branch',
-      `origin/${headRefName}`,
+      `origin/${head}`,
       '--pr',
       String(number),
       '--activate'

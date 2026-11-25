@@ -455,7 +455,7 @@ function Header({ pr }: { pr: PullRequest }) {
                 title="Check out in Orca"
                 aria-label="Check out in Orca"
                 disabled=${busy !== null}
-                onClick=${() => openInOrca(pr.repo, pr.number, pr.headRefName)}
+                onClick=${() => openInOrca(pr.repo, pr.number)}
               >
                 <${Icon} name="gitPullRequest" />
               </button>`

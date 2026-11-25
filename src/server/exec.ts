@@ -25,7 +25,14 @@ function which(command: string): string {
   return path
 }
 
-export class CommandError extends Error {}
+export class CommandError extends Error {
+  constructor(
+    message: string,
+    readonly missing = false
+  ) {
+    super(message)
+  }
+}
 
 export type RunOptions = { cwd?: string; input?: string; timeoutMs?: number }
 
@@ -49,7 +56,7 @@ export function run(command: string, args: string[], options: RunOptions = {}): 
                   .trim()
                   .split('\n')
                   .find((line) => line.trim()) ?? error.message)
-        reject(new CommandError(cause))
+        reject(new CommandError(cause, code === 'ENOENT'))
       }
     )
     if (options.input !== undefined) child.stdin?.end(options.input)

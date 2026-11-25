@@ -176,5 +176,5 @@ export default function activate(orca: OrcaWorkerApi): void {
   orca.panels.handle('issue.action', async ({ repo, number, action }) => ({
     message: await runIssueAction(repo, number, action)
   }))
-  orca.panels.handle('inbox.open', ({ repo, number, headRefName }) => dashboard.open(repo, number, headRefName))
+  orca.panels.handle('inbox.open', ({ repo, number }) => dashboard.open(repo, number))
 }
