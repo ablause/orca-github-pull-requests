@@ -1,45 +1,63 @@
-# GitHub for Orca
+# Pull Requests for GitHub
 
-The pull request of the focused worktree's branch in an Orca sidebar panel, images included, with the repository's pull requests and issues one step back.
+The pull request of the workspace you are in, in a panel of [Orca](https://orca.dev)'s right sidebar: what stands between it and the merge, its conversation with the images at full size, its checks, files and commits. One step back, the repository's pull requests and issues, with the ones your agents and bots named or asked you about marked where they stand.
 
-## The panel
+It follows the focused workspace, so switching worktrees switches the pull request. It reads GitHub through the GitHub CLI you already signed in to: there is no token to create.
 
-One **GitHub** panel in Orca's own look (its theme tokens, type scale and Lucide icons) that follows the focused worktree.
+## What you get
 
-It opens on the pull request of that worktree's branch. A status card leads: one line for what stands between the PR and its merge, worst first (conflicts, failing checks, changes requested, out of date, checks running, review required, unresolved conversations, or ready to merge), with the **Merge** button beside it and a confirmation step. Unfolded, it lists each blocker with its action (Fix with agent, Update branch) and holds the merge method, auto-merge, the admin bypass, draft and close. Only the top bar (back, refresh, open on GitHub, last update) stays pinned while scrolling.
+- **Status and merge.** One line says what blocks the merge, worst first: conflicts, failing checks, changes requested, out of date, checks running, review required, open conversations, or ready. The Merge button sits beside it, with the merge method, auto-merge, the admin bypass, draft and close one fold away.
+- **The conversation, images first.** The pull request's images as thumbnails, each opening full size with zoom and pan. Then the description, reviews with their threads (Reply, Resolve, Open file), pushes and events, and a comment form.
+- **Checks, files and commits.** Failing checks first, each opening its log. Changed files with their diffs, each opening in Orca's editor.
+- **What your agents talk about.** A pull request or an issue an agent of the workspace named, in its terminal or in a bot's chat, carries a **Mentioned** tag in the list. One it asks you about (Claude Code's `AskUserQuestion`) carries a **Question** tag that quotes it, from the moment it asks until you answer.
+- **Fix with agent.** For a failing check, a merge conflict or review comments, the panel drafts a message with the failing log lines or the comments, lets you edit it and pick an agent of the workspace, then pastes it into that agent's terminal.
+- **Issues too.** An issue opens in the same panel with its labels, assignees, linked pull requests, images and conversation, and a form to comment, close or reopen it.
+- **Anywhere in Orca.** Any pull request in the list opens in the panel, with **Check out in Orca** to start a worktree on its branch, or **Open agent** when an agent already works on it. With no repository focused, the panel lists your review requests, your pull requests and your issues.
 
-The **Conversation** tab starts with the PR's images as thumbnails: press one to see it full size and move through the others. The image opens fitted to the panel: a click shows it at real size around the point clicked, the mouse wheel or a trackpad pinch zooms around the pointer, a drag, a trackpad scroll or the arrow keys pan it, and `+`, `-` and `0` zoom in, out and back to fit. Then the description (folded past a screen, with Show more), comments and reviews with their threads (resolved ones folded, each with Reply, Resolve, Open file and Fix with agent), pushes folded to three commits, events, and the comment form. **Checks** lists failing checks first, each opening its logs. **Files** lists changed files with their diffs, and opens a file in Orca's editor. **Commits** lists the commits.
+## Install
 
-The back button leads to the repository's list: **Pull requests** or **Issues** on top, then Open and Closed, with the worktree's own PR highlighted, or pinned on top when the list leaves it out. Any PR in the list opens in the same panel, with a button to check it out in Orca. When a worktree in Orca is already on the PR's branch and an agent runs there, that button becomes **Open agent**, on the worktree's own PR too: it shows the agent's terminal, the one asking a question about this PR first. A branch without a pull request shows the list directly; with no worktree focused, the panel shows the pull requests and issues that involve you.
+Needs Orca 1.4.248 or newer and the [GitHub CLI](https://cli.github.com) signed in with `gh auth login` on the machine that runs Orca.
 
-Rows the focused worktree's agents named (`#1072`, `owner/repo#12` or a GitHub URL) carry a **Mentioned** tag where they already stand in the list, and the Pull requests and Issues tabs count them, so a mentioned issue is not missed from the PR tab. Mentions are read from what the worktree's terminals render when an agent ends a turn, never while it works, and only numbers not seen before reach GitHub. A chat has no terminal: its conversation is read instead, which is how a bot's workspace shows the pull requests its bot works on. A bot's home is a folder outside Git, so only a GitHub URL or `owner/repo#12` names something there, and what it names that no section can show (merged, closed, or not involving you) is listed under **Mentioned in this workspace**, what is still open first. The back button counts those that arrived since the list last showed them. A bare number of one digit is left out, since "step #1" is prose more often than a reference.
+In Orca, open Settings, then Plugins, search for **Pull Requests for GitHub** and install it. Or from a terminal:
 
-A question an agent asked (Claude Code's `AskUserQuestion`) that names a pull request or an issue stands out more than a mention. Its rows carry a **Question** tag and a coloured bar instead of **Mentioned**, the tabs count them apart from mentions, and a pull request or an issue opened in the panel wears the tag beside its state; hovering the tag quotes the question. The question is heard from Orca's tool hooks, with its exact wording, when it is asked and when it is answered, so nothing is guessed from the screen: it shows the moment the agent stops and goes when you answer. A question you dismiss stays until its agent works again. In a question one digit is enough: "merge #7?" names a pull request. Questions are kept in the plugin's own store, so one asked while you were away is still marked when you come back.
+```sh
+orca plugin install ablause/orca-github-pull-requests
+```
 
-An issue opens in the same panel: its labels and assignees, the pull requests linked to it, its images, description and conversation, and a form to comment, close it as completed or not planned, or reopen it. A pull request names the issues it closes under its branches, one press away.
+Orca shows what the plugin may do and asks you to approve it. The panel appears as **GitHub** in the right sidebar.
 
-**Fix with agent**, on the worktree's own pull request, drafts a message for a failing check (with the failing log lines), a merge conflict, or review conversations, lets you edit it and pick an agent of the workspace, then pastes it into that agent's terminal.
+## What it is allowed to do
 
-## Setup
+The plugin runs its own code on your machine, as you, which Orca marks as **Full access**. Here is what that code does with it.
 
-Requires the GitHub CLI (`gh`) on the Orca machine, signed in with `gh auth login`. Every call goes through `gh` with that account, so the plugin sees what that account can see and acts with its permissions.
+- **GitHub.** Every call goes through `gh` with your account, so the plugin sees what you can see on GitHub and acts with your permissions. It merges, comments, resolves threads or closes only when you press the button, and asks first for a merge.
+- **Orca.** It reads your workspaces, their terminals and agents (`workspace:read`, `agent:read`) to follow the focused one. To find the pull requests your agents name, it reads what the focused workspace's terminals show when an agent ends a turn and what a bot's chat says, and sends GitHub only the `owner/repo#number` references it found. It hears Claude Code's `AskUserQuestion` calls through Orca's tool hooks, and never changes or blocks them.
+- **Your terminals.** It types into a terminal (`terminal:send`) only when you press Send in Fix with agent, into the agent you picked. Check out in Orca runs `git fetch` and creates a worktree through Orca; Open agent switches to an agent's tab.
+- **Storage.** It keeps the questions agents asked in its own storage (`storage:own`), so one asked while you were away is still marked when you come back.
+
+It sends nothing anywhere but GitHub, through `gh`, and keeps no analytics.
 
 ## Limits
 
-- The panel has no network: the worker downloads each image from GitHub and hands it over as a data URL, shrinking those over 700 KB with `sips` on macOS. Elsewhere a large image shows as a link to GitHub, and so do videos.
-- Merging goes through `gh -R` against the repository and never touches the local checkout. A merge is refused when commits landed after the panel last loaded.
-- The panel checks the pull request's state with a small request every 15 seconds while checks run and every 60 seconds otherwise, only while it is visible, and right after a push from the workspace; it slows down to every 15 minutes once the pull request is merged or closed. The full page is fetched again only when that state changed. When GitHub's rate limit is reached, the plugin stops calling GitHub until it resets.
+- Tested on macOS. The panel has no network of its own: the worker downloads each image and hands it over inline, shrinking those over 700 KB with `sips`, which only macOS has. Elsewhere a large image shows as a link to GitHub, and so do videos.
+- Merging goes through `gh` against the repository and never touches your checkout. A merge is refused when commits landed after the panel last loaded.
+- The panel asks GitHub for the pull request's state every 15 seconds while checks run and every 60 seconds otherwise, only while it is visible, and every 15 minutes once the pull request is merged or closed. The full page is fetched again only when that state changed. When GitHub's rate limit is reached, the plugin stops calling it until the limit resets.
 - The timeline shows the last 150 events and the Files tab the first 300 files.
-- Opening a pull request in a new worktree works for branches of the same repository, not forks.
+- Check out in Orca works for pull requests from branches of the same repository. A fork's pull request is refused, with the `gh pr checkout` command to use instead.
+- A bare `#12` counts as a reference only inside a Git repository, and a one-digit `#7` only in a question, since "step #1" is prose more often than a reference.
 
 ## Develop
 
-From the repository root:
-
 ```sh
 npm install
-scripts/orca-types.sh github
-npm run typecheck
-orca plugin test ./github
-orca plugin dev watch ./github
+scripts/orca-types.sh .
+npm run check
+npm test
+orca plugin dev watch .
 ```
+
+`npm install` writes no symlinks (see `.npmrc`): Orca refuses a plugin folder that holds one, and `orca plugin dev watch .` loads this folder as it is.
+
+## License
+
+[MIT](LICENSE). The bundled Preact, htm and Lucide icons keep their own licenses, in `src/vendor`.
