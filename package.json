@@ -1,0 +1,17 @@
+{
+  "name": "orca-github-pull-requests",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "orca plugin test .",
+    "format": "prettier --write src README.md",
+    "check": "prettier --check src README.md && tsc -p ."
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^22.20.7",
+    "htm": "^3.1.1",
+    "preact": "^10.29.8",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3"
+  }
+}

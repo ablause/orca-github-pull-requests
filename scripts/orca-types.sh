@@ -3,7 +3,7 @@
 # Stands in for `orca plugin types`, which fails on builds that ship without orca.d.ts.
 set -euo pipefail
 
-plugin_dir="${1:?usage: scripts/orca-types.sh <plugin-dir>}"
+plugin_dir="${1:?usage: scripts/orca-types.sh .}"
 version="${ORCA_VERSION:-$(orca --version)}"
 base="https://raw.githubusercontent.com/stablyai/orca/v${version}/resources/plugins"
 types="${plugin_dir}/.orca/types"
