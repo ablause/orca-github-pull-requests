@@ -2,6 +2,8 @@
 
 The pull request of the workspace you are in, in a panel of [Orca](https://orca.dev)'s right sidebar: what stands between it and the merge, its conversation with the images at full size, its checks, files and commits. One step back, the repository's pull requests and issues, with the ones your agents and bots named or asked you about marked where they stand.
 
+![Pull Requests for GitHub: merge blockers struck through down to Ready to merge, beside the panel showing a pull request ready to merge](assets/cover.png)
+
 It follows the focused workspace, so switching worktrees switches the pull request. It reads GitHub through the GitHub CLI you already signed in to: there is no token to create.
 
 ## What you get
