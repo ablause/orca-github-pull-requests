@@ -1,10 +1,10 @@
 {
   "name": "orca-github-pull-requests",
   "scripts": {
-    "typecheck": "tsc -p .",
+    "typecheck": "node node_modules/typescript/bin/tsc -p .",
     "test": "orca plugin test .",
-    "format": "prettier --write src README.md",
-    "check": "prettier --check src README.md && tsc -p ."
+    "format": "node node_modules/prettier/bin/prettier.cjs --write src README.md",
+    "check": "node node_modules/prettier/bin/prettier.cjs --check src README.md && node node_modules/typescript/bin/tsc -p ."
   },
   "private": true,
   "devDependencies": {
